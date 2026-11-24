@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Tutor</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101329;color:white;font-family:Arial,sans-serif}
+header{text-align:center;background:#191d3d;padding:25px}
+h1{color:#a78bfa;margin:0}
+main{max-width:750px;margin:25px auto;padding:15px}
+.card{background:#1c2142;padding:20px;border-radius:16px;margin-bottom:18px}
+select,input{width:100%;padding:13px;border:0;border-radius:9px;background:#30365c;color:white;margin:8px 0}
+button{padding:12px;border:0;border-radius:9px;background:#8058e8;color:white;font-weight:bold;cursor:pointer;margin:5px}
+button:hover{background:#9675f2}
+#chat{height:230px;overflow:auto;background:#121630;padding:12px;border-radius:10px}
+.msg{padding:12px;margin:8px 0;border-radius:10px;line-height:1.5}
+.user{background:#55409a;text-align:right}
+.bot{background:#30365c}
+.result{margin-top:12px;padding:12px;background:#30365c;border-radius:9px}
+.small{font-size:12px;color:#c5c8df}
+</style>
+</head>
+<body>
+<header>
+<h1>✨ AI Tutor</h1>
+<p>Tu espacio para aprender y practicar</p>
+</header>
+<main>
+<section class="card">
+<h2>¿Qué quieres aprender?</h2>
+<select id="subject" onchange="newExercise()">
+<option>Matemáticas</option>
+<option>Inglés</option>
+<option>Ciencias</option>
+<option>Historia</option>
+</select>
+</section>
+
+<section class="card">
+<h2>📚 Tutor de estudio</h2>
+<div id="chat">
+<div class="msg bot">¡Hola! Elige una asignatura y escribe tu pregunta. Estoy aquí para ayudarte a estudiar.</div>
+</div>
+<input id="question" placeholder="Escribe tu pregunta...">
+<button onclick="send()" style="width:100%">Enviar pregunta</button>
+<p class="small">Respuestas de demostración, todavía sin IA externa.</p>
+</section>
+
+<section class="card">
+<h2>📝 Practica lo aprendido</h2>
+<p id="exercise">¿Cuánto es 8 + 5?</p>
+<input id="answer" placeholder="Escribe tu respuesta">
+<button onclick="check()">Comprobar respuesta</button>
+<button onclick="newExercise()">Otro ejercicio</button>
+<div id="result" class="result">¡Inténtalo!</div>
+</section>
+</main>
+
+<script>
+const exercises={
+"Matemáticas":[
+{q:"¿Cuánto es 8 + 5?",a:"13",e:"8 + 5 = 13."},
+{q:"¿Cuánto es 7 × 6?",a:"42",e:"7 multiplicado por 6 es 42."},
+{q:"¿Cuánto es 20 - 9?",a:"11",e:"20 menos 9 es 11."}
+],
+"Inglés":[
+{q:"¿Cómo se dice 'gato' en inglés?",a:"cat",e:"Gato se dice cat."},
+{q:"¿Cómo se dice 'libro' en inglés?",a:"book",e:"Libro se dice book."},
+{q:"Completa: I ___ happy. (am/is)",a:"am",e:"Se dice I am happy."}
+],
+"Ciencias":[
+{q:"¿Qué planeta es conocido como el planeta rojo?",a:"marte",e:"Marte es conocido como el planeta rojo."},
+{q:"¿Qué órgano bombea la sangre?",a:"corazon",e:"El corazón bombea la sangre."},
+{q:"¿En qué estado está el hielo?",a:"solido",e:"El hielo está en estado sólido."}
+],
+"Historia":[
+{q:"¿En qué país surgió la civilización egipcia antigua?",a:"egipto",e:"Surgió en Egipto, junto al río Nilo."},
+{q:"¿Qué construcción famosa hicieron los romanos para llevar agua?",a:"acueducto",e:"Los romanos construyeron acueductos."},
+{q:"¿En qué continente está Grecia?",a:"europa",e:"Grecia está en Europa."}
+]
+};
+let index=0;
+function newExercise(){
+ index=Math.floor(Math.random()*exercises[document.getElementById("subject").value].length);
+ document.getElementById("exercise").textContent=exercises[document.getElementById("subject").value][index].q;
+ document.getElementById("answer").value="";
+ document.getElementById("result").textContent="¡Inténtalo!";
+}
+function normalize(s){
+ return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+}
+function check(){
+ const list=exercises[document.getElementById("subject").value];
+ const answer=normalize(document.getElementById("answer").value);
+ const item=list[index];
+ if(!answer){document.getElementById("result").textContent="Escribe una respuesta primero.";return;}
+ if(answer===normalize(item.a)){
+ document.getElementById("result").textContent="¡Correcto! 🎉 "+item.e;
+ }else{
+ document.getElementById("result").textContent="Todavía no. La respuesta correcta es "+item.a+". "+item.e;
+ }
+}
+function send(){
+ const input=document.getElementById("question");
+ const q=input.value.trim();
+ if(!q)return;
+ const chat=document.getElementById("chat");
+ const u=document.createElement("div");
+ u.className="msg user";u.textContent=q;chat.appendChild(u);
+ const b=document.createElement("div");
+ b.className="msg bot";
+ b.textContent="¡Buena pregunta! Para estudiar "+document.getElementById("subject").value+", intenta dividir el tema en partes pequeñas y buscar un ejemplo. Esta respuesta es de demostración; todavía no tengo una IA conectada.";
+ chat.appendChild(b);
+ input.value="";chat.scrollTop=chat.scrollHeight;
+}
+document.getElementById("question").addEventListener("keydown",e=>{
+ if(e.key==="Enter")send();
+});
+newExercise();
+</script>
+</body>
+</html>
